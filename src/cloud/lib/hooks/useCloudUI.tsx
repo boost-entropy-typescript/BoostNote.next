@@ -267,7 +267,7 @@ export function useCloudUI() {
       }
       messageBox({
         title: `Delete ${title}`,
-        message: `Are you sure to remove for good this content?`,
+        message: `Are you sure you want to remove this permanently?`,
         iconType: DialogIconTypes.Warning,
         buttons: [
           {

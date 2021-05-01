@@ -1,12 +1,11 @@
 import { createGlobalStyle } from 'styled-components'
-import { backgroundColor, textColor } from '../lib/styled/styleFunctions'
-import { BaseTheme } from '../lib/styled/BaseTheme'
+import { BaseTheme } from '../shared/lib/styled/types'
 
 export default createGlobalStyle<BaseTheme>`
   body {
     margin: 0;
-    ${backgroundColor}
-    ${textColor}
+    background-color: ${({ theme }) => theme.colors.background.primary};
+    color: ${({ theme }) => theme.colors.text.primary};
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Fira sans', Roboto, Helvetica,
     Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
     font-size: 15px;
@@ -46,7 +45,7 @@ export default createGlobalStyle<BaseTheme>`
 
   th,
   td {
-    ${backgroundColor}
+      background-color: ${({ theme }) => theme.colors.background.primary};
   }
 
   /* total width */
@@ -57,12 +56,12 @@ export default createGlobalStyle<BaseTheme>`
 
   /* background of the scrollbar except button or resizer */
   ::-webkit-scrollbar-track {
-    background-color: ${({ theme }) => theme.scrollBarTrackColor};
+    background-color: ${({ theme }) => theme.colors.background.quaternary};
   }
 
   /* scrollbar itself */
   ::-webkit-scrollbar-thumb {
-    background-color: ${({ theme }) => theme.scrollBarThumbColor};
+    background-color: ${({ theme }) => theme.colors.background.tertiary};
   }
 
   /* set button(top and bottom of the scrollbar) */

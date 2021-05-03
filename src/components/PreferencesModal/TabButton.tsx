@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
-import Button from '../../shared/components/atoms/Button'
 import styled from '../../shared/lib/styled'
+import cc from 'classcat'
 
 interface TabButtonProps {
   label: string
@@ -9,24 +9,33 @@ interface TabButtonProps {
   setTab: (tab: string) => void
 }
 
-const TabButtonContainer = styled.button`
-  #tab_local_btn {
-    width: 100%;
-    border-radius: 4px;
-    height: 30px;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-  }
-
-  .btn_label {
+const StyledButton = styled.button`
+  width: 100%;
+  border-radius: 4px;
+  height: 30px;
+  background-color: ${({ theme }) => theme.colors.background.primary};
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  .label {
     flex: 1;
     color: ${({ theme }) => theme.colors.text.primary};
     text-align: left;
     padding-left: 15px;
     font-size: 14px;
+  }
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.background.secondary};
+  }
+  &.active {
+    color: ${({ theme }) => theme.colors.text.secondary};
+    background-color: ${({ theme }) => theme.colors.background.tertiary};
+    .label {
+      color: ${({ theme }) => theme.colors.text.primary};
+      color: ${({ theme }) => theme.colors.text.secondary};
+    }
   }
 `
 
@@ -35,21 +44,20 @@ const TabButton = ({ label, tab, setTab, active }: TabButtonProps) => {
     setTab(tab)
   }, [tab, setTab])
   return (
-    <TabButtonContainer>
-      <Button
-        variant='primary'
-        id='tab_local_btn'
-        onClick={selectTab}
-        active={active}
-        className={'btn_label'}
-      >
-        {label}
-      </Button>
-    </TabButtonContainer>
+    // <TabButtonContainer>
+    //   <Button
+    //     className={'tab_button_style'}
+    //     variant='primary'
+    //     onClick={selectTab}
+    //     active={active}
+    //   >
+    //     <div className='tab_button_label'>{label}</div>
+    //   </Button>
+    // </TabButtonContainer>
 
-    // <StyledButton onClick={selectTab} className={cc([active && 'active'])}>
-    //   <div className='label'>{label}</div>
-    // </StyledButton>
+    <StyledButton onClick={selectTab} className={cc([active && 'active'])}>
+      <div className='label'>{label}</div>
+    </StyledButton>
   )
 }
 

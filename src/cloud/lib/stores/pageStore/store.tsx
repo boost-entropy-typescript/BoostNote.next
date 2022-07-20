@@ -16,7 +16,7 @@ import { SerializedSubscription } from '../../../interfaces/db/subscription'
 import { SubscriptionInfo } from './types'
 import { getFormattedDateFromUnixTimestamp } from '../../date'
 import { useGlobalData } from '../globalData'
-import { freePlanDocLimit } from '../../subscription'
+import { remainingTrialInfo } from '../../subscription'
 
 interface PageStoreProps {
   pageProps: any
@@ -208,21 +208,15 @@ function usePageDataStore(pageProps: any, navigatingBetweenPage: boolean) {
       }
     }
 
-    const docCount = team.creationsCounter
-    const trialIsOver = !team.trial
-    const overLimit = docCount >= freePlanDocLimit
-    const rate =
-      docCount === 0 ? 0 : Math.ceil((docCount / freePlanDocLimit) * 100)
-    const progressLabel = `${docCount}/${freePlanDocLimit}`
-
+    const { remaining, max, end } = remainingTrialInfo(team)
     return {
       trialing: false,
       info: {
-        docLimit: freePlanDocLimit,
-        trialIsOver,
-        progressLabel,
-        rate,
-        overLimit,
+        cancelled: !team.trial,
+        trialIsOver: remaining < 1,
+        progressLabel: `${max - remaining}/${max}`,
+        endDate: end,
+        rate: ((max - remaining) / max) * 100,
       },
     }
   }, [subscription, team])

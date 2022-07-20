@@ -153,14 +153,14 @@ const enTranslation: TranslationSource = {
   [lngKeys.SendUsAMessage]: 'Send us a message',
   [lngKeys.KeyboardShortcuts]: 'Keyboard Shortcuts',
 
-  [lngKeys.SettingsSubLimitUsed]: '{{docsNb}} docs used',
+  [lngKeys.SettingsSubLimitUsed]: '{{docsNb}} days',
   [lngKeys.SettingsSubLimitTrialTitle]: 'Upgrade to go unlimited',
   [lngKeys.SettingsSubLimitTrialDate]:
     "Your workspace's trial of the Pro plan lasts through {{date}}",
   [lngKeys.SettingsSubLimitTrialUpgrade]:
     'You can upgrade at anytime during your trial.',
   [lngKeys.SettingsSubLimitTrialEnd]:
-    'Your pro plan trial has ended. Please upgrade now',
+    'Your trial has ended on {{date}}. Please upgrade now.',
   [lngKeys.SettingsSubLimitUnderFreePlan]:
     'Under the free plan, you can create up to {{limit}} docs.',
 

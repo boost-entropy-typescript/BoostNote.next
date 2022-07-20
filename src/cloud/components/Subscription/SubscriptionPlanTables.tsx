@@ -1,27 +1,15 @@
-import { formatDistanceToNow } from 'date-fns'
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useMediaQuery } from 'react-responsive'
-import { SerializedSubscription } from '../../interfaces/db/subscription'
-import { SerializedTeam } from '../../interfaces/db/team'
 import { SubscriptionPeriod, UpgradePlans } from '../../lib/stripe'
 import {
-  freePlanDashboardPerUserPerTeamLimit,
-  freePlanDocLimit,
-  freePlanSmartViewPerDashboardLimit,
-  freePlanStorageMb,
-  freePlanUploadSizeMb,
-  freeTrialPeriodDays,
   paidPlanUploadSizeMb,
   proPlanStorageMb,
-  revisionHistoryFreeDays,
   revisionHistoryStandardDays,
   standardPlanStorageMb,
 } from '../../lib/subscription'
 import cc from 'classcat'
 import Button from '../../../design/components/atoms/Button'
 import styled from '../../../design/lib/styled'
-import { useI18n } from '../../lib/hooks/useI18n'
-import { lngKeys } from '../../lib/i18n/types'
 import { ExternalLink } from '../../../design/components/atoms/Link'
 import Pastille from '../../../design/components/atoms/Pastille'
 import Switch from '../../../design/components/atoms/Switch'
@@ -30,73 +18,27 @@ import Flexbox from '../../../design/components/atoms/Flexbox'
 import plur from 'plur'
 
 interface SubscriptionPlansTablesProps {
-  team: SerializedTeam
-  subscription?: SerializedSubscription
   selectedPlan: UpgradePlans | 'free'
   selectedPeriod?: SubscriptionPeriod
   discounted?: boolean
-  freePlanFooter?: React.ReactNode
   hidePeriod?: boolean
-  onFreeCallback?: () => void
+  onCancel?: () => void
   onStandardCallback?: () => void
   onProCallback?: () => void
-  onTrialCallback?: () => void
   setSelectedPeriod?: React.Dispatch<React.SetStateAction<SubscriptionPeriod>>
 }
 
 const SubscriptionPlanTables = ({
-  team,
   selectedPlan,
   selectedPeriod = 'yearly',
   hidePeriod = false,
   setSelectedPeriod,
-  onFreeCallback,
-  onTrialCallback,
   onStandardCallback,
   onProCallback,
-  subscription,
+  onCancel,
   discounted,
-  freePlanFooter,
 }: SubscriptionPlansTablesProps) => {
-  const { translate } = useI18n()
   const isTabletOrMobile = useMediaQuery({ maxWidth: 1080 })
-
-  const freeTrialContent = useMemo(() => {
-    if (subscription != null) {
-      if (subscription.status !== 'trialing') {
-        return null
-      }
-
-      const trialEndDate = new Date(subscription.currentPeriodEnd * 1000)
-      return (
-        <p>
-          <span className='check'>&#x2713;</span>{' '}
-          {translate(lngKeys.PlanInTrial, {
-            remaining: formatDistanceToNow(trialEndDate, {
-              includeSeconds: false,
-            }),
-          })}
-        </p>
-      )
-    }
-
-    if (!team.trial || onTrialCallback == null) {
-      return null
-    }
-
-    return (
-      <Button
-        variant='link'
-        className='free__trial__btn'
-        onClick={(e: any) => {
-          e.preventDefault()
-          onTrialCallback()
-        }}
-      >
-        {translate(lngKeys.PlanTrial, { days: freeTrialPeriodDays })}
-      </Button>
-    )
-  }, [subscription, team, onTrialCallback, translate])
 
   return (
     <Container className={cc(['plans', isTabletOrMobile && 'plans--mobile'])}>
@@ -126,49 +68,18 @@ const SubscriptionPlanTables = ({
             <td>
               <SubscriptionPlanHeader
                 period={selectedPeriod}
-                plan='free'
-                discounted={discounted}
-              />
-              <div className='plan__item__footer'>
-                {selectedPlan === 'free' ? (
-                  freePlanFooter != null ? (
-                    freePlanFooter
-                  ) : (
-                    <Button
-                      className='upgrade__btn'
-                      disabled={true}
-                      size='lg'
-                      variant='secondary'
-                    >
-                      Current Plan
-                    </Button>
-                  )
-                ) : (
-                  <Button
-                    onClick={onFreeCallback}
-                    className='upgrade__btn'
-                    size='lg'
-                  >
-                    Downgrade
-                  </Button>
-                )}
-              </div>
-            </td>
-            <td>
-              <SubscriptionPlanHeader
-                period={selectedPeriod}
                 plan='standard'
-                discounted={discounted}
+                discounted={discounted && selectedPeriod === 'yearly'}
               />
               <div className='plan__item__footer'>
                 {selectedPlan === 'standard' ? (
                   <Button
                     className='upgrade__btn'
-                    disabled={true}
+                    onClick={onCancel}
                     size='lg'
                     variant='secondary'
                   >
-                    Current Plan
+                    Cancel
                   </Button>
                 ) : (
                   <Button
@@ -186,17 +97,17 @@ const SubscriptionPlanTables = ({
               <SubscriptionPlanHeader
                 period={selectedPeriod}
                 plan='pro'
-                discounted={discounted}
+                discounted={discounted && selectedPeriod === 'yearly'}
               />
               <div className='plan__item__footer'>
                 {selectedPlan === 'pro' ? (
                   <Button
                     className='upgrade__btn'
-                    disabled={true}
+                    onClick={onCancel}
                     variant='secondary'
                     size='lg'
                   >
-                    Current Plan
+                    Cancel
                   </Button>
                 ) : (
                   <Button
@@ -222,30 +133,21 @@ const SubscriptionPlanTables = ({
             </td>
             <td>Unlimited</td>
             <td>Unlimited</td>
-            <td>Unlimited</td>
           </tr>
           <tr>
             <td>Documents</td>
-            <td>{freePlanDocLimit} per team</td>
             <td>Unlimited</td>
             <td>Unlimited</td>
           </tr>
 
           <tr>
             <td>Storage Limit</td>
-            <td>{freePlanStorageMb}mb per member</td>
             <td>{standardPlanStorageMb / 1000}GB per member</td>
             <td>{proPlanStorageMb / 1000}GB per member</td>
           </tr>
 
           <tr>
             <td>Dashboards</td>
-            <td>
-              {freePlanDashboardPerUserPerTeamLimit}{' '}
-              {plur('Dashboard', freePlanDashboardPerUserPerTeamLimit)},
-              <br />
-              {freePlanSmartViewPerDashboardLimit} smart views per member
-            </td>
             <td>Unlimited</td>
             <td>Unlimited</td>
           </tr>
@@ -254,22 +156,16 @@ const SubscriptionPlanTables = ({
             <td>Integrations</td>
             <td>2000+ integrations</td>
             <td>2000+ integrations</td>
-            <td>2000+ integrations</td>
           </tr>
 
           <tr>
             <td>Collaborative Workspace</td>
-            <td>&#x2713;</td>
             <td className='marked'>&#x2713;</td>
             <td className='marked'>&#x2713;</td>
           </tr>
 
           <tr>
             <td>Revision History</td>
-            <td>
-              Last {revisionHistoryFreeDays}{' '}
-              {plur('day', revisionHistoryFreeDays)}
-            </td>
             <td className='marked'>
               Last {revisionHistoryStandardDays}{' '}
               {plur('day', revisionHistoryStandardDays)}
@@ -279,7 +175,6 @@ const SubscriptionPlanTables = ({
 
           <tr>
             <td>File upload size</td>
-            <td>{freePlanUploadSizeMb}Mb per file</td>
             <td className='marked'>{paidPlanUploadSizeMb}Mb per file</td>
             <td className='marked'>{paidPlanUploadSizeMb}Mb per file</td>
           </tr>
@@ -287,13 +182,11 @@ const SubscriptionPlanTables = ({
           <tr>
             <td>Guest Invite</td>
             <td>&#x2717;</td>
-            <td>&#x2717;</td>
             <td className='marked'>&#x2713;</td>
           </tr>
 
           <tr>
             <td>Password/Expiration date for sharing</td>
-            <td>&#x2717;</td>
             <td>&#x2717;</td>
             <td className='marked'>&#x2713;</td>
           </tr>
@@ -301,15 +194,7 @@ const SubscriptionPlanTables = ({
           <tr>
             <td>Priority Support</td>
             <td>&#x2717;</td>
-            <td>&#x2717;</td>
             <td className='marked'>&#x2713;</td>
-          </tr>
-
-          <tr>
-            <td>Free trial</td>
-            <td>&#x2717;</td>
-            <td>&#x2717;</td>
-            <td>{freeTrialContent}</td>
           </tr>
         </tbody>
       </table>

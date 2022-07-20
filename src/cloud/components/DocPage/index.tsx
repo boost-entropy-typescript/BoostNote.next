@@ -21,7 +21,7 @@ import { useRouter } from '../../lib/router'
 import ColoredBlock from '../../../design/components/atoms/ColoredBlock'
 import Editor from '../Editor'
 import ApplicationPage from '../ApplicationPage'
-import { freePlanDocLimit, freePlanMembersLimit } from '../../lib/subscription'
+import { freePlanMembersLimit, teamIsReadonly } from '../../lib/subscription'
 import { useCloudDocPreview } from '../../lib/hooks/useCloudDocPreview'
 
 interface DocPageProps {
@@ -97,7 +97,7 @@ const DocPage = ({
     if (
       subscription == null &&
       team != null &&
-      team.creationsCounter > freePlanDocLimit
+      teamIsReadonly(team, subscription)
     ) {
       return false
     }

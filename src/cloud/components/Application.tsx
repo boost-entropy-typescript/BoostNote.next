@@ -30,7 +30,7 @@ import { mapUsers } from '../../design/lib/mappers/users'
 import {
   mdiCog,
   mdiDownload,
-  mdiGiftOutline,
+  mdiExclamationThick,
   mdiInbox,
   mdiLogoutVariant,
   mdiMagnify,
@@ -49,8 +49,6 @@ import {
 import { useModal } from '../../design/lib/stores/modal'
 import NewDocButton from './buttons/NewDocButton'
 import { useCloudSidebarTree } from '../lib/hooks/sidebar/useCloudSidebarTree'
-import { isTimeEligibleForDiscount } from '../lib/subscription'
-import DiscountModal from './Modal/contents/DiscountModal'
 import { Notification as UserNotification } from '../interfaces/db/notifications'
 import useNotificationState from '../../design/lib/hooks/useNotificationState'
 import { useNotifications } from '../../design/lib/stores/notifications'
@@ -64,7 +62,6 @@ import SidebarHeader from '../../design/components/organisms/Sidebar/atoms/Sideb
 import SidebarButtonList from '../../design/components/organisms/Sidebar/molecules/SidebarButtonList'
 import { getTeamLinkHref } from './Link/TeamLink'
 import WithPastille from '../../design/components/atoms/WithPastille'
-import SidebarButton from '../../design/components/organisms/Sidebar/atoms/SidebarButton'
 import CloudGlobalSearch from './CloudGlobalSearch'
 import { useCloudSidebarSpaces } from '../lib/hooks/sidebar/useCloudSidebarSpaces'
 import { trackEvent } from '../api/track'
@@ -78,6 +75,7 @@ import SidebarSubscriptionCTA from './Subscription/SidebarSubscriptionCTA'
 import { isEmpty } from 'lodash'
 import LoaderTopbar from '../../design/components/atoms/loaders/LoaderTopbar'
 import Icon from '../../design/components/atoms/Icon'
+import ExportModal from './Modal/contents/ExportModal'
 
 interface ApplicationProps {
   className?: string
@@ -101,7 +99,6 @@ const Application = ({
     permissions = [],
     currentUserPermissions,
     currentUserIsCoreMember,
-    subscription,
     navigatingBetweenPage,
   } = usePage()
   const { openModal } = useModal()
@@ -406,6 +403,23 @@ const Application = ({
               },
               id: 'sidebar__button__members',
             },
+            {
+              label: 'Export your data',
+              icon: (
+                <WithPastille>
+                  <Icon size={16} path={mdiExclamationThick} />
+                </WithPastille>
+              ),
+              variant: 'transparent',
+              labelClick: () => {
+                return openModal(<ExportModal />, {
+                  showCloseIcon: true,
+                  width: 'large',
+                })
+              },
+              id: 'sidebar__button__export',
+              pastille: counts[team.id] ? counts[team.id] : undefined,
+            },
           ]}
         >
           {currentUserIsCoreMember && <NewDocButton team={team} />}
@@ -422,6 +436,7 @@ const Application = ({
     team,
     translate,
     showSearchScreen,
+    openModal,
   ])
 
   const sidebarFooter = useMemo(() => {
@@ -450,31 +465,11 @@ const Application = ({
               id: 'sidebar__button__shared',
             },
           ]}
-        >
-          {isTimeEligibleForDiscount(team) && subscription == null ? (
-            <SidebarButton
-              variant='subtle'
-              icon={
-                <WithPastille>
-                  <Icon size={16} path={mdiGiftOutline} />
-                </WithPastille>
-              }
-              id='sidebar__button__promo'
-              label={translate(lngKeys.SidebarNewUserDiscount)}
-              labelClick={() => {
-                trackEvent(MixpanelActionTrackTypes.DiscountSidebar)
-                return openModal(<DiscountModal />, {
-                  showCloseIcon: true,
-                  width: 'large',
-                })
-              }}
-            />
-          ) : null}
-        </SidebarButtonList>
+        />
         <SidebarSubscriptionCTA />
       </>
     )
-  }, [team, translate, pathname, subscription, push, sendToElectron, openModal])
+  }, [team, translate, pathname, push, sendToElectron])
 
   return (
     <>
@@ -535,7 +530,6 @@ const Application = ({
           </>
         }
       />
-
       <AnnouncementAlert />
       <div
         id='application__anchor'

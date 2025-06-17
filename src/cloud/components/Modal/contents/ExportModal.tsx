@@ -4,10 +4,13 @@ import { usePage } from '../../../lib/stores/pageStore'
 import { LoadingButton } from '../../../../design/components/atoms/Button'
 import { exportWorkspace } from '../../../api/teams/export'
 import Flexbox from '../../../../design/components/atoms/Flexbox'
+import { useI18n } from '../../../lib/hooks/useI18n'
+import { lngKeys } from '../../../lib/i18n/types'
 
 const ExportModal = () => {
   const { team } = usePage()
   const [sending, setSending] = useState(false)
+  const { translate } = useI18n()
 
   const handleExportClick = useCallback(async () => {
     if (team == null || sending) {
@@ -40,18 +43,18 @@ const ExportModal = () => {
   return (
     <Container className='export__modal'>
       <header className='export__modal__header'>
-        <div className='export__modal__title'>Export your space data</div>
+        <div className='export__modal__title'>
+          {translate(lngKeys.ExportTitle)}
+        </div>
       </header>
       <p className='export__modal__description'>
-        The service for boostnote is planned to be retired at the end of
-        September. We recommend exporting your space&apos;s data so that you do
-        not lose any of your information.
+        {translate(lngKeys.ExportSubtitle)}
       </p>
-      <p>Here is an overview of what can be exported:</p>
+      <p>{translate(lngKeys.ExportContent)}</p>
       <ul>
-        <li>Public & your accessible private Folders & documents hierarchy</li>
-        <li>Your Documents&apos; content</li>
-        <li>Your Documents&apos;attachments</li>
+        <li>{translate(lngKeys.ExportContentOne)}</li>
+        <li>{translate(lngKeys.ExportContentTwo)}</li>
+        <li>{translate(lngKeys.ExportContentThree)}</li>
       </ul>
 
       <Flexbox justifyContent='center'>
@@ -60,7 +63,7 @@ const ExportModal = () => {
           spinning={sending}
           onClick={handleExportClick}
         >
-          Download ZIP
+          {translate(lngKeys.ExportDownload)}
         </LoadingButton>
       </Flexbox>
     </Container>
